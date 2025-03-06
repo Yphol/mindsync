@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/darkBackground">
+
+    <!-- Include header -->
+    <include layout="@layout/header" />
+
+    <!-- Main content for Reports page -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Centered toggle for Day/Week -->
+            <RadioGroup
+                android:id="@+id/rgTimeFrame"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
+                <RadioButton
+                    android:id="@+id/rbDay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Day"
+                    android:textColor="@color/lightText"
+                    android:checked="true"
+                    style="@style/CustomRadioButton"/>
+                <RadioButton
+                    android:id="@+id/rbWeek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Week"
+                    android:textColor="@color/lightText"
+                    style="@style/CustomRadioButton"/>
+            </RadioGroup>
+
+            <!-- Horizontal scroll view for time selection -->
+            <HorizontalScrollView
+                android:id="@+id/hsvTimeSelector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:id="@+id/llTimeItems"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <!-- Items will be added dynamically -->
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Switch for graph percentage view -->
+            <Switch
+                android:id="@+id/switchGraphPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show Percentage per App"
+                android:textColor="@color/lightText"
+                android:layout_marginTop="16dp" />
+
+            <!-- Gap -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
+
+            <!-- Placeholder for retrieved screen time data -->
+            <TextView
+                android:id="@+id/tvReportData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Screen Time Data will appear here"
+                android:textColor="@color/lightText"
+                android:textSize="16sp"
+                android:padding="8dp" />
+
+            <!-- Additional graphs or content can be added here -->
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Include footer -->
+    <include layout="@layout/footer" />
+</LinearLayout>

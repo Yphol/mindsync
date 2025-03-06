@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+    <ImageView
+        android:id="@+id/imgRecAppIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@mipmap/ic_launcher" />
+    <TextView
+        android:id="@+id/tvRecAppName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="App Name"
+        android:textColor="@color/lightText"
+        android:textSize="16sp"
+        android:paddingStart="8dp"/>
+    <Button
+        android:id="@+id/btnRecAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Action"
+        style="@style/CustomFooterButton"/>
+    <Button
+        android:id="@+id/btnRestrict"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restrict"
+        style="@style/CustomFooterButton"
+        android:layout_marginStart="8dp"/>
+</LinearLayout>

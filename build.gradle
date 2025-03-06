@@ -1,0 +1,17 @@
+buildscript {
+    ext {
+        kotlin_version = '1.8.20'  // or your current version
+        compose_version = '1.4.3'  // or your current version
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.8.1'  // Update to latest stable
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.48'
+    }
+}
+
+// Remove allprojects as it's now handled in settings.gradle 

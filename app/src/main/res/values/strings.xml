@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MindSync</string>
+    <string name="focus_state_image">Focus state indicator</string>
+    <string name="total_screen_time">Total Screen Time: %1$dh %2$dm</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    
+    <!-- Analytics -->
+    <string name="over_limit_format">Over limit: %1$s</string>
+    <string name="peak_hours_format">Peak Hours: %1$s</string>
+    <string name="avg_session_format">Average Session: %1$s</string>
+</resources>

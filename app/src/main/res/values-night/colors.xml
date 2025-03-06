@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme colors -->
+    <color name="background_primary">#121212</color>
+    <color name="background_secondary">#1E1E1E</color>
+    <color name="background_tertiary">#2D2D2D</color>
+    <color name="darkBackground">#121212</color>
+    <color name="embedBackground">#2F3136</color>
+    
+    <!-- Accent colors -->
+    <color name="accent_blurple">#7289DA</color>
+    <color name="accent_green">#43B581</color>
+    <color name="colorAccent">#7289DA</color>
+    <color name="primaryColor">#7289DA</color>
+    
+    <!-- Text colors -->
+    <color name="text_normal">#FFFFFF</color>
+    <color name="text_muted">#99AAB5</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="lightText">#FFFFFF</color>
+    <color name="grayText">#95A5A6</color>
+    
+    <!-- Chip colors -->
+    <color name="chip_background">#2D2D2D</color>
+    <color name="chip_background_selected">#3F3F3F</color>
+    
+    <!-- Standard colors -->
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#7289DA</color>
+    <color name="purple_700">#5B6EAE</color>
+    <color name="teal_200">#43B581</color>
+    <color name="teal_700">#368A63</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="design_default_color_primary">#BB86FC</color>
+    <color name="design_default_color_secondary">#03DAC5</color>
+</resources> 

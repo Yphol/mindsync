@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.MindSync" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/accent_blurple</item>
+        <item name="colorPrimaryVariant">@color/background_tertiary</item>
+        <item name="colorOnPrimary">@color/text_normal</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/accent_green</item>
+        <item name="colorSecondaryVariant">@color/background_secondary</item>
+        <item name="colorOnSecondary">@color/text_normal</item>
+
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/background_tertiary</item>
+        <item name="android:navigationBarColor">@color/background_tertiary</item>
+        <item name="android:windowBackground">@color/background_primary</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/background_primary</item>
+        <item name="colorSurface">@color/background_secondary</item>
+        <item name="colorOnSurface">@color/text_normal</item>
+
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/text_normal</item>
+        <item name="android:textColorSecondary">@color/text_muted</item>
+
+        <!-- Card style -->
+        <item name="materialCardViewStyle">@style/CustomCard</item>
+        
+        <!-- Button style -->
+        <item name="materialButtonStyle">@style/CustomButton</item>
+        
+        <!-- Chip style -->
+        <item name="chipStyle">@style/CustomChip</item>
+    </style>
+</resources>

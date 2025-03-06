@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkBackground"  
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Screen time today -->
+        <TextView
+            android:id="@+id/tvScreenTimeToday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Screen Time Today: 2h 30m"
+            android:textColor="@color/lightText"
+            android:textSize="20sp"
+            android:padding="8dp"/>
+
+        <!-- Restricted Apps List -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Restricted Apps"
+            android:textColor="@color/lightText"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"/>
+        <LinearLayout
+            android:id="@+id/llRestrictedApps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_embed_background"
+            android:padding="8dp">
+            <!-- Items added dynamically -->
+        </LinearLayout>
+
+        <!-- Recommended Actions List -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recommended Actions"
+            android:textColor="@color/lightText"
+            android:textSize="18sp"
+            android:paddingTop="16dp"
+            android:paddingBottom="8dp"/>
+        <LinearLayout
+            android:id="@+id/llRecommendedActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_embed_background"
+            android:padding="8dp">
+            <!-- Items added dynamically -->
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

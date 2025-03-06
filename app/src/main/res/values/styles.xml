@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base dark theme -->
+    <style name="Theme.MindSync.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/background_primary</item>
+        <item name="colorPrimary">@color/accent_blurple</item>
+        <item name="colorPrimaryVariant">@color/background_tertiary</item>
+        <item name="colorOnPrimary">@color/text_normal</item>
+        <item name="colorSecondary">@color/accent_green</item>
+        <item name="colorSecondaryVariant">@color/background_secondary</item>
+        <item name="colorOnSecondary">@color/text_normal</item>
+        <item name="android:statusBarColor">@color/background_tertiary</item>
+        <item name="android:navigationBarColor">@color/background_tertiary</item>
+    </style>
+
+    <!-- Custom RadioButton style -->
+    <style name="CustomRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:buttonTint">@color/colorAccent</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- Custom Footer Button style -->
+    <style name="CustomFooterButton">
+        <item name="android:backgroundTint">@color/primaryColor</item>
+        <item name="android:textColor">@color/lightText</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <!-- Popup Menu Style with dark background and light text -->
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/darkBackground</item>
+        <item name="android:textColor">@color/lightText</item>
+    </style>
+
+    <!-- Custom card style -->
+    <style name="CustomCard" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/background_secondary</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="rippleColor">@color/accent_blurple</item>
+    </style>
+
+    <!-- Custom button style -->
+    <style name="CustomButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/text_normal</item>
+        <item name="backgroundTint">@color/accent_blurple</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- Add these to your existing styles.xml -->
+    <style name="CardTitle">
+        <item name="android:textColor">@color/text_normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CustomChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="chipBackgroundColor">@color/chip_background</item>
+        <item name="chipStrokeColor">@color/accent_blurple</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="rippleColor">@color/accent_blurple</item>
+    </style>
+
+    <style name="StatLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <style name="StatValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_normal</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">8dp</item>
+    </style>
+
+    <style name="NumberPickerStyle">
+        <item name="android:textColorPrimary">@color/text_normal</item>
+        <item name="android:colorControlNormal">@color/accent_blurple</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+</resources>

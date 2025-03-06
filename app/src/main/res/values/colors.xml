@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme colors -->
+    <color name="background_primary">#121212</color>
+    <color name="background_secondary">#1E1E1E</color>
+    <color name="background_tertiary">#2D2D2D</color>
+    <color name="darkBackground">#121212</color>
+    <color name="embedBackground">#2F3136</color>
+    
+    <!-- Accent colors -->
+    <color name="accent_blurple">#7289DA</color>
+    <color name="accent_green">#43B581</color>
+    <color name="colorAccent">#7289DA</color>
+    <color name="primaryColor">#7289DA</color>
+    
+    <!-- Text colors -->
+    <color name="text_normal">#FFFFFF</color>
+    <color name="text_muted">#99AAB5</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#99FFFFFF</color>
+    <color name="lightText">#FFFFFF</color>
+    <color name="grayText">#95A5A6</color>
+    
+    <!-- Chip colors -->
+    <color name="chip_background">#2D2D2D</color>
+    <color name="chip_background_selected">#3D3D3D</color>
+    <color name="chip_text">#FFFFFF</color>
+    
+    <!-- Standard colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Status and Priority Colors -->
+    <color name="success_green">#4CAF50</color>
+    <color name="warning_yellow">#FFC107</color>
+    <color name="error_red">#F44336</color>
+    <color name="neutral_gray">#9E9E9E</color>
+    <color name="high_priority">#F44336</color>
+    <color name="medium_priority">#FFC107</color>
+    <color name="low_priority">#4CAF50</color>
+    
+    <!-- Chart Colors -->
+    <color name="chart_blue">#2196F3</color>
+    <color name="chart_green">#4CAF50</color>
+    <color name="chart_red">#F44336</color>
+    <color name="chart_yellow">#FFC107</color>
+    <color name="chart_purple">#9C27B0</color>
+    <color name="chart_orange">#FF9800</color>
+    <color name="chart_social_media">#FF4081</color>
+    <color name="chart_overall_usage">#2196F3</color>
+    <color name="chart_over_limit">#FF5722</color>
+    <color name="chart_session">#4CAF50</color>
+    <color name="chart_success_rate">#9C27B0</color>
+    <color name="chart_text">#FFFFFF</color>
+
+    <color name="design_default_color_primary">#6200EE</color>
+    <color name="design_default_color_secondary">#03DAC6</color>
+</resources>
