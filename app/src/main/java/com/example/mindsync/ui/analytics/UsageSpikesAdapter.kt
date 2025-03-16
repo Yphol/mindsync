@@ -1,70 +1,50 @@
 package com.example.mindsync.ui.analytics
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mindsync.data.model.UsageSpike
-import com.example.mindsync.databinding.ItemUsageSpikeBinding
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.TimeUnit
+import com.example.mindsync.R
+import com.example.mindsync.data.model.UsageSpikeItem
 
-class UsageSpikesAdapter : ListAdapter<UsageSpike, UsageSpikesAdapter.ViewHolder>(UsageSpikeDiffCallback()) {
+class UsageSpikesAdapter : ListAdapter<UsageSpikeItem, UsageSpikesAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemUsageSpikeBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ViewHolder(binding)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_usage_spike, parent, false)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder(
-        private val binding: ItemUsageSpikeBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-        private val dateFormat = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
-        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val tvAppName: TextView = itemView.findViewById(R.id.tvAppName)
+        private val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+        private val tvDuration: TextView = itemView.findViewById(R.id.tvDuration)
+        private val tvTimeRange: TextView = itemView.findViewById(R.id.tvTimeRange)
 
-        fun bind(item: UsageSpike) {
-            binding.apply {
-                tvAppName.text = item.appName
-                tvDate.text = dateFormat.format(item.startTime)
-                tvDuration.text = formatDuration(item.duration)
-                tvTimeRange.text = "${timeFormat.format(item.startTime)} - ${timeFormat.format(item.endTime)}"
-                
-                if (item.sessionCount > 1) {
-                    tvSessionCount.text = "${item.sessionCount} sessions"
-                    tvSessionCount.visibility = android.view.View.VISIBLE
-                } else {
-                    tvSessionCount.visibility = android.view.View.GONE
-                }
-            }
-        }
-
-        private fun formatDuration(millis: Long): String {
-            val hours = TimeUnit.MILLISECONDS.toHours(millis)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
-            return when {
-                hours > 0 -> "${hours}h ${minutes}m"
-                else -> "${minutes}m"
-            }
+        fun bind(item: UsageSpikeItem) {
+            tvAppName.text = item.appName
+            tvDate.text = item.date
+            tvDuration.text = item.duration
+            tvTimeRange.text = item.timeRange
         }
     }
-}
 
-private class UsageSpikeDiffCallback : DiffUtil.ItemCallback<UsageSpike>() {
-    override fun areItemsTheSame(oldItem: UsageSpike, newItem: UsageSpike): Boolean {
-        return oldItem.startTime == newItem.startTime && oldItem.appName == newItem.appName
-    }
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<UsageSpikeItem>() {
+            override fun areItemsTheSame(oldItem: UsageSpikeItem, newItem: UsageSpikeItem): Boolean {
+                return oldItem.appName == newItem.appName && oldItem.date == newItem.date
+            }
 
-    override fun areContentsTheSame(oldItem: UsageSpike, newItem: UsageSpike): Boolean {
-        return oldItem == newItem
+            override fun areContentsTheSame(oldItem: UsageSpikeItem, newItem: UsageSpikeItem): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 } 

@@ -8,6 +8,27 @@
     
     <!-- Analytics -->
     <string name="over_limit_format">Over limit: %1$s</string>
-    <string name="peak_hours_format">Peak Hours: %1$s</string>
-    <string name="avg_session_format">Average Session: %1$s</string>
+    <string name="peak_hours_format">Peak Hours: %s</string>
+    <string name="avg_session_format">Avg. Session: %s</string>
+    
+    <!-- App Blocking -->
+    <string name="app_blocked_title">App Restricted</string>
+    <string name="app_blocked_message">%1$s is currently restricted. Take a break and focus on something else.</string>
+    <string name="go_home">Go Home</string>
+    <string name="open_dashboard">Open Dashboard</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="accessibility_permission_message">To block restricted apps, MindSync needs Accessibility permission. Please enable it in Settings.</string>
+    <string name="overlay_permission_message">To show blocking screens, MindSync needs permission to display over other apps.</string>
+    <string name="usage_stats_permission_message">To track app usage, MindSync needs permission to access usage statistics. Please enable it in Settings.</string>
+    <string name="enable">Enable</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Dashboard Overview -->
+    <string name="todays_overview">Today\'s Overview</string>
+    <string name="screen_time">Screen Time</string>
+    <string name="live_indicator">LIVE</string>
+    <string name="focus_score">Focus Score</string>
+    <string name="success_rate">Success Rate</string>
+    <string name="productive_time">Productive Time</string>
+    <string name="usage_pattern">Today\'s Usage Pattern</string>
 </resources>

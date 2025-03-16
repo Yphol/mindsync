@@ -30,7 +30,7 @@
         android:id="@+id/btnRestrict"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Restrict"
+        android:text="Limit"
         style="@style/CustomFooterButton"
         android:layout_marginStart="8dp"/>
 </LinearLayout>

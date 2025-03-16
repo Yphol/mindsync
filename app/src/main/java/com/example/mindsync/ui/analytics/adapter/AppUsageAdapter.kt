@@ -1,4 +1,4 @@
-package com.example.mindsync.ui.analytics
+package com.example.mindsync.ui.analytics.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mindsync.R
+import com.example.mindsync.ui.analytics.AppUsageItem
 
 class AppUsageAdapter : ListAdapter<AppUsageItem, AppUsageAdapter.ViewHolder>(DIFF_CALLBACK) {
 

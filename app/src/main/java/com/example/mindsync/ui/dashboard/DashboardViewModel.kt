@@ -13,8 +13,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.mindsync.data.manager.AppAccessManager
 import com.example.mindsync.data.model.*
-import com.example.mindsync.data.repository.MockAnalyticsRepository
+import com.example.mindsync.data.repository.UsageStatsRepository
 import com.example.mindsync.service.TimerService
 import com.example.mindsync.service.TimerUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     application: Application,
-    private val analyticsRepository: MockAnalyticsRepository
+    private val usageStatsRepository: UsageStatsRepository,
+    private val appAccessManager: AppAccessManager
 ) : AndroidViewModel(application) {
 
     private val packageManager: PackageManager = application.packageManager
@@ -162,26 +164,95 @@ class DashboardViewModel @Inject constructor(
 
     private fun loadTodaysUsage() {
         viewModelScope.launch {
-            val calendar = Calendar.getInstance()
-            val endDate = calendar.time
-            
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            
-            val startDate = calendar.time
-            val data = analyticsRepository.getSocialMediaUsage(startDate, endDate)
-            _todaysUsageData.value = data
+            if (usageStatsRepository.hasUsageStatsPermission()) {
+                val calendar = Calendar.getInstance()
+                val endTime = calendar.timeInMillis
+                
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                
+                val startTime = calendar.timeInMillis
+                val data = usageStatsRepository.getAppUsageData(startTime, endTime)
+                _todaysUsageData.value = data
+                Log.d(TAG, "Loaded today's usage data: ${data.size} apps")
+            } else {
+                Log.d(TAG, "No usage stats permission")
+                _todaysUsageData.value = emptyList()
+            }
         }
     }
 
     fun addRestriction(appInfo: AppInfo, endTime: Date?, isForever: Boolean) {
-        // Implementation will be added later
+        try {
+            Log.d(TAG, "Adding restriction for ${appInfo.packageName}, isForever: $isForever, endTime: $endTime")
+            
+            // Create the restriction object
+            val restriction = AppRestriction(
+                packageName = appInfo.packageName,
+                appName = appInfo.appName,
+                icon = appInfo.icon,
+                startTime = Date(),
+                endTime = endTime,
+                isForever = isForever,
+                remainingTime = endTime?.let { it.time - System.currentTimeMillis() } ?: 0
+            )
+            
+            // Add to the app access manager
+            appAccessManager.addRestriction(restriction)
+            
+            // Add to the timer service
+            timerService?.addRestriction(restriction)
+            
+            // Update the UI
+            val currentRestrictions = _activeRestrictions.value?.toMutableList() ?: mutableListOf()
+            currentRestrictions.add(restriction)
+            _activeRestrictions.value = currentRestrictions
+            
+            // Update the restriction times map
+            if (!isForever && endTime != null) {
+                val currentTimes = _restrictionTimes.value?.toMutableMap() ?: mutableMapOf()
+                val remaining = endTime.time - System.currentTimeMillis()
+                if (remaining > 0) {
+                    currentTimes[appInfo.packageName] = remaining
+                    _restrictionTimes.value = currentTimes
+                }
+            }
+            
+            Log.d(TAG, "Restriction added successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error adding restriction", e)
+        }
     }
 
     fun removeRestriction(packageName: String) {
-        // Implementation will be added later
+        try {
+            Log.d(TAG, "Removing restriction for $packageName")
+            
+            // Remove from the app access manager
+            appAccessManager.removeRestriction(packageName)
+            
+            // Remove from the timer service
+            timerService?.removeRestriction(packageName)
+            
+            // Update the UI
+            val currentRestrictions = _activeRestrictions.value?.toMutableList() ?: mutableListOf()
+            val index = currentRestrictions.indexOfFirst { it.packageName == packageName }
+            if (index != -1) {
+                currentRestrictions.removeAt(index)
+                _activeRestrictions.value = currentRestrictions
+            }
+            
+            // Update the restriction times map
+            val currentTimes = _restrictionTimes.value?.toMutableMap() ?: mutableMapOf()
+            currentTimes.remove(packageName)
+            _restrictionTimes.value = currentTimes
+            
+            Log.d(TAG, "Restriction removed successfully")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error removing restriction", e)
+        }
     }
 
     fun startFocusTimer(durationMinutes: Int) {
@@ -221,6 +292,26 @@ class DashboardViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "Error setting app time limit", e)
         }
+    }
+
+    fun checkAccessibilityPermission(): Boolean {
+        return appAccessManager.isAccessibilityServiceEnabled()
+    }
+
+    fun requestAccessibilityPermission() {
+        appAccessManager.promptEnableAccessibilityService()
+    }
+
+    fun hasUsageStatsPermission(): Boolean {
+        return usageStatsRepository.hasUsageStatsPermission()
+    }
+
+    fun checkOverlayPermission(): Boolean {
+        return appAccessManager.canDrawOverlays()
+    }
+
+    fun requestOverlayPermission() {
+        appAccessManager.requestOverlayPermission()
     }
 
     override fun onCleared() {

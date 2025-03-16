@@ -28,31 +28,52 @@
             android:padding="8dp">
 
             <!-- Time Range Selection -->
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/timeRangeChipGroup"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/timeRangeContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:singleSelection="true">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipDaily"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Today" />
+                    android:text="Time Range"
+                    android:textColor="@color/text_normal"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipWeekly"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/timeRangeChipGroup"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Week" />
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipMonthly"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Month" />
-            </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipToday"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today"
+                        android:checked="true"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipWeek"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Week"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipMonth"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Month"/>
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
 
             <!-- Overall Usage Card -->
             <androidx.cardview.widget.CardView
@@ -73,18 +94,24 @@
                         android:id="@+id/tvTotalTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp" />
+                        android:layout_marginBottom="4dp"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/chart_blue" />
 
                     <TextView
                         android:id="@+id/tvOverLimitTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp" />
+                        android:layout_marginBottom="16dp"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_normal" />
 
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/overallTrendChart"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="200dp"
+                        android:visibility="visible" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -127,7 +154,8 @@
             <com.github.mikephil.charting.charts.BarChart
                         android:id="@+id/hourlyUsageChart"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="200dp"
+                        android:visibility="visible" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -292,7 +320,8 @@
                     <com.github.mikephil.charting.charts.LineChart
                         android:id="@+id/weeklyTrendChart"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="200dp"
+                        android:visibility="visible" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

@@ -17,37 +17,66 @@ class MockAnalyticsRepository @Inject constructor() {
         "Snapchat" to "com.snapchat.android"
     )
 
+    /**
+     * Get mock social media usage data for the specified date range
+     */
     fun getSocialMediaUsage(startDate: Date, endDate: Date): List<AppUsageData> {
-        val usageData = mutableListOf<AppUsageData>()
         val calendar = Calendar.getInstance()
-        var currentDate = startDate
-
-        while (currentDate <= endDate) {
-            socialMediaApps.forEach { (appName, packageName) ->
-                // Generate random usage data for each app for each day
-                val timeSpent = Random.nextLong(15 * 60 * 1000, 3 * 60 * 60 * 1000) // 15min to 3h
-                val overLimitTime = if (Random.nextBoolean()) Random.nextLong(0, timeSpent / 2) else 0
-                val sessionCount = Random.nextInt(5, 20)
-
-                usageData.add(
+        val currentDate = calendar.time
+        
+        val apps = listOf(
+            "Instagram" to "com.instagram.android",
+            "Facebook" to "com.facebook.katana",
+            "Twitter" to "com.twitter.android",
+            "TikTok" to "com.zhiliaoapp.musically",
+            "YouTube" to "com.google.android.youtube",
+            "WhatsApp" to "com.whatsapp",
+            "Telegram" to "org.telegram.messenger",
+            "Snapchat" to "com.snapchat.android",
+            "Gmail" to "com.google.android.gm",
+            "Chrome" to "com.android.chrome"
+        )
+        
+        val result = mutableListOf<AppUsageData>()
+        
+        // Generate data for each day in the range
+        var date = startDate
+        while (date <= endDate) {
+            calendar.time = date
+            
+            // Generate data for each app
+            for ((appName, packageName) in apps) {
+                // Generate random usage time between 10 minutes and 3 hours
+                val timeSpent = Random.nextLong(10 * 60 * 1000, 3 * 60 * 60 * 1000)
+                
+                // Generate random session count between 1 and 20
+                val sessionCount = Random.nextInt(1, 20)
+                
+                // Generate random over limit time (0-30% of total time)
+                val overLimitTime = if (Random.nextBoolean()) {
+                    (timeSpent * Random.nextDouble(0.0, 0.3)).toLong()
+                } else {
+                    0L
+                }
+                
+                result.add(
                     AppUsageData(
                         appName = appName,
                         packageName = packageName,
                         timeSpent = timeSpent,
-                        date = currentDate,
+                        date = date,
                         overLimitTime = overLimitTime,
                         sessionCount = sessionCount
                     )
                 )
             }
-
+            
             // Move to next day
-            calendar.time = currentDate
             calendar.add(Calendar.DAY_OF_YEAR, 1)
-            currentDate = calendar.time
+            date = calendar.time
         }
-
-        return usageData
+        
+        return result
     }
 
     fun getAchievements(): List<Achievement> {

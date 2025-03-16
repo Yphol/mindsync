@@ -91,6 +91,9 @@ dependencies {
     
     // Fragment
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+    
+    // JSON Parsing
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // Testing Dependencies
     testImplementation("junit:junit:4.13.2")

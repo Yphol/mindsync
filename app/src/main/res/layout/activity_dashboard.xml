@@ -29,7 +29,10 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/dashboardContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottomNav"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -42,120 +45,101 @@
                     style="@style/CustomCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/chart_blue"
+                    app:cardCornerRadius="16dp"
                     android:layout_margin="8dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp"
-                        android:background="@color/background_tertiary">
+                        android:padding="16dp">
 
                         <!-- Header -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/todays_overview"
+                            android:textColor="@color/text_normal"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="16dp"/>
+
+                        <!-- Total Screen Time with Label -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:layout_marginBottom="12dp">
-
-                            <TextView
+                            android:layout_marginBottom="16dp">
+                            
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="TODAY'S OVERVIEW"
-                                android:textColor="@color/chart_blue"
-                                android:textSize="20sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:textStyle="bold"/>
-
+                                android:orientation="vertical">
+                                
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/screen_time"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="14sp"/>
+                                    
+                                <TextView
+                                    android:id="@+id/tvTotalScreenTime"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/chart_blue"
+                                    android:textSize="28sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textStyle="bold"/>
+                            </LinearLayout>
+                            
+                            <!-- Live Indicator -->
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="LIVE"
-                                android:textColor="@color/chart_blue"
-                                android:background="@drawable/pill_background"
-                                android:paddingHorizontal="12dp"
+                                android:text="@string/live_indicator"
+                                android:textColor="@color/accent_green"
+                                android:textSize="12sp"
+                                android:background="@drawable/rounded_metric_background"
+                                android:paddingHorizontal="8dp"
                                 android:paddingVertical="4dp"
-                                android:textSize="10sp"
-                                android:letterSpacing="0.1"
                                 android:fontFamily="sans-serif-medium"/>
                         </LinearLayout>
-
-                        <!-- Screen Time Chart -->
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/screenTimeChart"
-                            android:layout_width="match_parent"
-                            android:layout_height="140dp"
-                            android:layout_marginBottom="12dp"/>
-
-                        <!-- Total Screen Time -->
-                        <TextView
-                            android:id="@+id/tvTotalScreenTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/chart_blue"
-                            android:textSize="32sp"
-                            android:fontFamily="sans-serif-medium"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="12dp"/>
 
                         <!-- Metrics Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:weightSum="3">
+                            android:layout_marginBottom="16dp">
 
                             <!-- Focus Score -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical">
-                                
+                                android:orientation="vertical"
+                                android:background="@drawable/rounded_metric_background"
+                                android:padding="12dp"
+                                android:layout_marginEnd="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/focus_score"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="12sp"/>
+
                                 <TextView
                                     android:id="@+id/tvFocusScore"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="24sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/chart_green"/>
-                                    
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="FOCUS"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/text_muted"
-                                    android:letterSpacing="0.1"/>
-                            </LinearLayout>
-
-                            <!-- Productive Time -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-                                
-                                <TextView
-                                    android:id="@+id/tvProductiveTime"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="24sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/chart_purple"/>
-                                    
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="PRODUCTIVE"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/text_muted"
-                                    android:letterSpacing="0.1"/>
+                                    android:textColor="@color/text_normal"
+                                    android:textSize="20sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textStyle="bold"/>
                             </LinearLayout>
 
                             <!-- Success Rate -->
@@ -163,25 +147,83 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical">
-                                
+                                android:orientation="vertical"
+                                android:background="@drawable/rounded_metric_background"
+                                android:padding="12dp"
+                                android:layout_marginStart="8dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/success_rate"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="12sp"/>
+
                                 <TextView
                                     android:id="@+id/tvSuccessRate"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="24sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/chart_orange"/>
-                                    
+                                    android:textColor="@color/text_normal"
+                                    android:textSize="20sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textStyle="bold"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Productive Time -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_productivity"
+                                android:tint="@color/accent_green"
+                                android:layout_marginEnd="8dp"
+                                android:contentDescription="Productivity icon"/>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="SUCCESS"
-                                    android:textSize="10sp"
+                                    android:text="@string/productive_time"
                                     android:textColor="@color/text_muted"
-                                    android:letterSpacing="0.1"/>
+                                    android:textSize="14sp"/>
+
+                                <TextView
+                                    android:id="@+id/tvProductiveTime"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/accent_green"
+                                    android:textSize="18sp"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:textStyle="bold"/>
                             </LinearLayout>
                         </LinearLayout>
+                        
+                        <!-- Screen Time Chart -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/usage_pattern"
+                            android:textColor="@color/text_muted"
+                            android:textSize="14sp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="8dp"/>
+                            
+                        <View
+                            android:id="@+id/screenTimeChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="120dp"
+                            android:background="@color/background_tertiary"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

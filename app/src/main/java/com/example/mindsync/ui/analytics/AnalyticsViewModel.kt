@@ -1,19 +1,22 @@
 package com.example.mindsync.ui.analytics
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mindsync.data.model.*
-import com.example.mindsync.data.repository.MockAnalyticsRepository
+import com.example.mindsync.data.repository.UsageStatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class AnalyticsViewModel @Inject constructor(
-    private val analyticsRepository: MockAnalyticsRepository
+    private val usageStatsRepository: UsageStatsRepository
 ) : ViewModel() {
 
     private val _overallUsage = MutableLiveData<OverallUsage>()
@@ -49,221 +52,154 @@ class AnalyticsViewModel @Inject constructor(
 
     private fun loadAnalytics(timeRange: TimeRangePreset) {
         viewModelScope.launch {
-            val calendar = Calendar.getInstance()
-            val endDate = calendar.time
-
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-
-            when (timeRange) {
-                TimeRangePreset.TODAY -> Unit // Start date is already set to today
-                TimeRangePreset.LAST_7_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -6)
-                TimeRangePreset.LAST_30_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -29)
-                TimeRangePreset.LAST_90_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -89)
+            if (usageStatsRepository.hasUsageStatsPermission()) {
+                loadRealUsageData(timeRange)
+            } else {
+                // Just initialize with empty data if no permission
+                _appUsageBreakdown.value = emptyList()
+                _hourlyUsage.value = emptyList()
+                _weeklyTrends.value = emptyList()
+                _usageSpikes.value = emptyList()
+                _usagePatterns.value = UsagePatterns("", 0, emptyList(), emptyList())
+                _overallUsage.value = OverallUsage(0, 0, emptyList())
             }
-
-            val startDate = calendar.time
-
-            // Load all analytics data
-            val usageData = analyticsRepository.getSocialMediaUsage(startDate, endDate)
-            processUsageData(usageData, startDate, endDate)
         }
     }
-
-    private fun processUsageData(
-        usageData: List<AppUsageData>,
-        startDate: Date,
-        endDate: Date
-    ) {
-        if (usageData.isEmpty()) return
-
-        // Process overall usage
-        val totalTime = usageData.sumOf { it.timeSpent }
-        val overLimitTime = usageData.sumOf { it.overLimitTime }
-        val dailyUsage = calculateDailyUsage(usageData, startDate, endDate)
-        _overallUsage.value = OverallUsage(totalTime, overLimitTime, dailyUsage)
-
-        // Process app breakdown
-        _appUsageBreakdown.value = usageData.groupBy { it.appName }
-            .map { (appName, data) ->
-                AppUsageData(
-                    appName = appName,
-                    packageName = data.first().packageName,
-                    timeSpent = data.sumOf { it.timeSpent },
-                    date = data.maxByOrNull { it.date }?.date ?: Date(),
-                    overLimitTime = data.sumOf { it.overLimitTime },
-                    sessionCount = data.sumOf { it.sessionCount }
-                )
-            }
-            .sortedByDescending { it.timeSpent }
-
-        // Process hourly usage
-        _hourlyUsage.value = calculateHourlyUsage(usageData)
-
-        // Process weekly trends
-        _weeklyTrends.value = calculateWeeklyTrends(usageData, startDate, endDate)
-
-        // Process usage spikes
-        _usageSpikes.value = detectUsageSpikes(usageData)
-
-        // Process usage patterns
-        _usagePatterns.value = analyzeUsagePatterns(usageData)
-    }
-
-    private fun calculateDailyUsage(
-        usageData: List<AppUsageData>,
-        startDate: Date,
-        endDate: Date
-    ): List<Long> {
+    
+    private suspend fun loadRealUsageData(timeRange: TimeRangePreset) = withContext(Dispatchers.IO) {
         val calendar = Calendar.getInstance()
-        val dailyUsage = mutableListOf<Long>()
-        var currentDate = startDate
+        val endTime = calendar.timeInMillis
 
-        while (currentDate <= endDate) {
-            calendar.time = currentDate
-            val nextDay = calendar.apply {
-                add(Calendar.DAY_OF_YEAR, 1)
-                add(Calendar.MILLISECOND, -1)
-            }.time
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
 
-            val dayUsage = usageData.filter { it.date in currentDate..nextDay }
-                .sumOf { it.timeSpent }
-            dailyUsage.add(dayUsage)
-
-            calendar.add(Calendar.MILLISECOND, 1)
-            currentDate = calendar.time
+        when (timeRange) {
+            TimeRangePreset.TODAY -> Unit // Start date is already set to today
+            TimeRangePreset.LAST_7_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -6)
+            TimeRangePreset.LAST_30_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -29)
+            TimeRangePreset.LAST_90_DAYS -> calendar.add(Calendar.DAY_OF_YEAR, -89)
         }
 
-        return dailyUsage
-    }
-
-    private fun calculateHourlyUsage(usageData: List<AppUsageData>): List<HourlyUsage> {
-        val hourlyMap = (0..23).associateWith { hour ->
-            val hourData = usageData.filter {
-                Calendar.getInstance().apply { time = it.date }.get(Calendar.HOUR_OF_DAY) == hour
+        val startTime = calendar.timeInMillis
+        
+        Log.d("AnalyticsViewModel", "Loading real usage data for time range: $timeRange")
+        Log.d("AnalyticsViewModel", "Start time: ${Date(startTime)}, End time: ${Date(endTime)}")
+        
+        // Get app usage data
+        val appUsageData = usageStatsRepository.getAppUsageData(startTime, endTime)
+        Log.d("AnalyticsViewModel", "Retrieved ${appUsageData.size} apps with usage data")
+        
+        // Process app usage breakdown first to ensure it's available
+        processAppUsageBreakdown(appUsageData)
+        
+        // Process the data based on time range
+        when (timeRange) {
+            TimeRangePreset.TODAY -> {
+                // Get hourly data for today
+                val hourlyData = usageStatsRepository.getHourlyUsageData()
+                Log.d("AnalyticsViewModel", "Retrieved hourly data with ${hourlyData.size} hours")
+                processHourlyData(hourlyData)
             }
+            TimeRangePreset.LAST_7_DAYS -> {
+                // Get daily data for the week
+                val dailyData = usageStatsRepository.getDailyUsageData(7)
+                Log.d("AnalyticsViewModel", "Retrieved daily data with ${dailyData.size} days")
+                processDailyData(dailyData)
+            }
+            TimeRangePreset.LAST_30_DAYS -> {
+                // Get weekly data for the month
+                val weeklyData = usageStatsRepository.getWeeklyUsageData(4)
+                Log.d("AnalyticsViewModel", "Retrieved weekly data with ${weeklyData.size} weeks")
+                processWeeklyData(weeklyData)
+            }
+            TimeRangePreset.LAST_90_DAYS -> {
+                // Get weekly data for 3 months
+                val weeklyData = usageStatsRepository.getWeeklyUsageData(12)
+                Log.d("AnalyticsViewModel", "Retrieved weekly data with ${weeklyData.size} weeks")
+                processWeeklyData(weeklyData)
+            }
+        }
+    }
+    
+    private fun processHourlyData(hourlyData: Map<Int, Long>) {
+        val hourlyUsageList = hourlyData.map { (hour, timeSpent) ->
             HourlyUsage(
                 hour = hour,
-                timeSpent = hourData.sumOf { it.timeSpent },
-                sessionCount = hourData.sumOf { it.sessionCount }
+                timeSpent = timeSpent,
+                sessionCount = 1 // We don't have session count in this simplified approach
             )
-        }
-        return hourlyMap.values.toList()
-    }
-
-    private fun calculateWeeklyTrends(
-        usageData: List<AppUsageData>,
-        startDate: Date,
-        endDate: Date
-    ): List<DailyUsage> {
-        val calendar = Calendar.getInstance()
-        val weeklyTrends = mutableListOf<DailyUsage>()
-        var currentDate = startDate
-
-        val dayNames = arrayOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-
-        while (currentDate <= endDate) {
-            calendar.time = currentDate
-            val nextDay = calendar.apply {
-                add(Calendar.DAY_OF_YEAR, 1)
-                add(Calendar.MILLISECOND, -1)
-            }.time
-
-            val dayData = usageData.filter { it.date in currentDate..nextDay }
-            weeklyTrends.add(
-                DailyUsage(
-                    date = currentDate,
-                    dayOfWeek = dayNames[calendar.get(Calendar.DAY_OF_WEEK) - 1],
-                    timeSpent = dayData.sumOf { it.timeSpent },
-                    sessionCount = dayData.sumOf { it.sessionCount }
-                )
-            )
-
-            calendar.add(Calendar.MILLISECOND, 1)
-            currentDate = calendar.time
-        }
-
-        return weeklyTrends
-    }
-
-    private fun detectUsageSpikes(usageData: List<AppUsageData>): List<UsageSpike> {
-        val spikes = mutableListOf<UsageSpike>()
-        val groupedByApp = usageData.groupBy { it.appName }
-
-        for ((appName, appData) in groupedByApp) {
-            val avgTimeSpent = appData.map { it.timeSpent }.average()
-            val threshold = avgTimeSpent * 1.5 // 50% above average
-
-            appData.filter { it.timeSpent > threshold }
-                .forEach { data ->
-                    spikes.add(
-                        UsageSpike(
-                            appName = appName,
-                            startTime = data.date,
-                            endTime = Calendar.getInstance().apply {
-                                time = data.date
-                                add(Calendar.MILLISECOND, data.timeSpent.toInt())
-                            }.time,
-                            duration = data.timeSpent,
-                            sessionCount = data.sessionCount
-                        )
-                    )
-                }
-        }
-
-        return spikes.sortedByDescending { it.duration }
-    }
-
-    private fun analyzeUsagePatterns(usageData: List<AppUsageData>): UsagePatterns {
-        // Find peak hours
-        val hourlyUsage = calculateHourlyUsage(usageData)
-        val peakHours = hourlyUsage
-            .sortedByDescending { it.timeSpent }
-            .take(3)
-            .joinToString("-") { "${it.hour}:00" }
-
-        // Calculate average session time
-        val totalSessions = usageData.sumOf { it.sessionCount }
-        val totalTime = usageData.sumOf { it.timeSpent }
-        val avgSessionTime = if (totalSessions > 0) totalTime / totalSessions else 0
-
-        // Find most used apps
-        val mostUsedApps = usageData.groupBy { it.appName }
-            .mapValues { it.value.sumOf { data -> data.timeSpent } }
-            .entries.sortedByDescending { it.value }
-            .take(3)
-            .map { it.key }
-
-        // Identify common patterns
-        val commonPatterns = mutableListOf<String>()
+        }.sortedBy { it.hour }
         
-        // Morning usage pattern
-        val morningUsage = hourlyUsage.filter { it.hour in 6..11 }
-            .sumOf { it.timeSpent }
-        if (morningUsage > totalTime * 0.3) {
-            commonPatterns.add("Heavy morning usage")
-        }
-
-        // Evening usage pattern
-        val eveningUsage = hourlyUsage.filter { it.hour in 18..23 }
-            .sumOf { it.timeSpent }
-        if (eveningUsage > totalTime * 0.4) {
-            commonPatterns.add("Heavy evening usage")
-        }
-
-        // Frequent short sessions pattern
-        val avgSessionsPerHour = totalSessions.toFloat() / 24
-        if (avgSessionsPerHour > 3) {
-            commonPatterns.add("Frequent short sessions")
-        }
-
-        return UsagePatterns(
-            peakHours = peakHours,
-            avgSessionTime = avgSessionTime,
-            mostUsedApps = mostUsedApps,
-            commonPatterns = commonPatterns
+        _hourlyUsage.postValue(hourlyUsageList)
+        
+        // Calculate total time
+        val totalTime = hourlyData.values.sum()
+        val overallUsage = OverallUsage(
+            totalTime = totalTime,
+            overLimitTime = 0, // We don't have over limit time in this approach
+            dailyUsage = hourlyData.values.toList()
         )
+        _overallUsage.postValue(overallUsage)
+    }
+    
+    private fun processDailyData(dailyData: Map<Long, Long>) {
+        val calendar = Calendar.getInstance()
+        val dayNames = arrayOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+        
+        val dailyUsageList = dailyData.map { (timestamp, timeSpent) ->
+            calendar.timeInMillis = timestamp
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1 // 0-based index
+            
+            DailyUsage(
+                date = Date(timestamp),
+                dayOfWeek = dayNames[dayOfWeek],
+                timeSpent = timeSpent,
+                sessionCount = 1 // We don't have session count in this simplified approach
+            )
+        }.sortedBy { it.date }
+        
+        _weeklyTrends.postValue(dailyUsageList)
+        
+        // Calculate total time
+        val totalTime = dailyData.values.sum()
+        val overallUsage = OverallUsage(
+            totalTime = totalTime,
+            overLimitTime = 0, // We don't have over limit time in this approach
+            dailyUsage = dailyData.values.toList()
+        )
+        _overallUsage.postValue(overallUsage)
+    }
+    
+    private fun processWeeklyData(weeklyData: Map<Long, Long>) {
+        val calendar = Calendar.getInstance()
+        
+        val weeklyUsageList = weeklyData.map { (timestamp, timeSpent) ->
+            calendar.timeInMillis = timestamp
+            val weekNumber = calendar.get(Calendar.WEEK_OF_YEAR)
+            
+            DailyUsage( // Reusing DailyUsage for weekly data
+                date = Date(timestamp),
+                dayOfWeek = "Week $weekNumber",
+                timeSpent = timeSpent,
+                sessionCount = 1 // We don't have session count in this simplified approach
+            )
+        }.sortedBy { it.date }
+        
+        _weeklyTrends.postValue(weeklyUsageList)
+        
+        // Calculate total time
+        val totalTime = weeklyData.values.sum()
+        val overallUsage = OverallUsage(
+            totalTime = totalTime,
+            overLimitTime = 0, // We don't have over limit time in this approach
+            dailyUsage = weeklyData.values.toList()
+        )
+        _overallUsage.postValue(overallUsage)
+    }
+    
+    private fun processAppUsageBreakdown(appUsageData: List<AppUsageData>) {
+        _appUsageBreakdown.postValue(appUsageData.sortedByDescending { it.timeSpent })
     }
 } 

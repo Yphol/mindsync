@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_permission_message"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged|typeWindowsChanged"
+    android:accessibilityFlags="flagReportViewIds|flagRequestFilterKeyEvents|flagRequestEnhancedWebAccessibility|flagIncludeNotImportantViews"
+    android:accessibilityFeedbackType="feedbackVisual|feedbackGeneric"
+    android:notificationTimeout="50"
+    android:canRetrieveWindowContent="true"
+    android:canRequestFilterKeyEvents="true"
+    android:canRequestEnhancedWebAccessibility="true"
+    android:settingsActivity="com.example.mindsync.ui.dashboard.DashboardActivity" /> 

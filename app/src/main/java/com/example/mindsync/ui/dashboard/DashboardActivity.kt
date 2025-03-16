@@ -20,19 +20,12 @@ import com.example.mindsync.ui.settings.SettingsFragment
 import com.example.mindsync.ui.restriction.AppSelectionBottomSheet
 import com.example.mindsync.ui.restriction.RestrictionSettingsBottomSheet
 import com.example.mindsync.ui.restriction.adapter.ActiveRestrictionsAdapter
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.components.XAxis
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import android.app.AlertDialog
 import android.widget.NumberPicker
+import android.provider.Settings
 
 @AndroidEntryPoint
 class DashboardActivity : AppCompatActivity() {
@@ -50,11 +43,18 @@ class DashboardActivity : AppCompatActivity() {
             setContentView(binding.root)
 
             setupViews()
+            checkRequiredPermissions()
         } catch (e: Exception) {
             Log.e(TAG, "Error in onCreate", e)
             Toast.makeText(this, "Error initializing app: ${e.message}", Toast.LENGTH_LONG).show()
             finish()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Check permissions again when returning to the app
+        checkRequiredPermissions(showPrompt = false)
     }
 
     private fun setupViews() {
@@ -82,41 +82,8 @@ class DashboardActivity : AppCompatActivity() {
 
     private fun setupCharts() {
         try {
-            binding.screenTimeChart.apply {
-                description.isEnabled = false
-                legend.isEnabled = false
-                setTouchEnabled(false)
-                setDrawGridBackground(false)
-                setDrawBorders(false)
-                
-                xAxis.apply {
-                    setDrawAxisLine(false)
-                    setDrawGridLines(true)
-                    gridColor = ContextCompat.getColor(context, R.color.background_tertiary)
-                    gridLineWidth = 0.5f
-                    position = XAxis.XAxisPosition.BOTTOM
-                    setDrawLabels(false)
-                }
-
-                axisLeft.apply {
-                    setDrawAxisLine(false)
-                    setDrawGridLines(true)
-                    gridColor = ContextCompat.getColor(context, R.color.background_tertiary)
-                    gridLineWidth = 0.5f
-                    setDrawLabels(false)
-                }
-
-                axisRight.isEnabled = false
-                
-                setNoDataText("")
-                animateX(1000)
-                
-                setViewPortOffsets(4f, 4f, 4f, 4f)
-                extraBottomOffset = 0f
-                extraTopOffset = 0f
-                extraLeftOffset = 0f
-                extraRightOffset = 0f
-            }
+            // We'll use a simpler approach without MPAndroidChart
+            Log.d(TAG, "Setting up charts with a simpler approach")
         } catch (e: Exception) {
             Log.e(TAG, "Error setting up charts", e)
         }
@@ -145,16 +112,27 @@ class DashboardActivity : AppCompatActivity() {
             }
 
             binding.btnAddRestriction.setOnClickListener {
-                AppSelectionBottomSheet().apply {
-                    onAppSelected = { appInfo ->
-                        RestrictionSettingsBottomSheet.newInstance(appInfo).apply {
-                            onRestrictionSet = { app, endTime, isForever ->
-                                viewModel.addRestriction(app, endTime, isForever)
+                // Check permissions before showing app selection
+                checkPermissionsAndProceed {
+                    AppSelectionBottomSheet().apply {
+                        onAppSelected = { appInfo ->
+                            RestrictionSettingsBottomSheet.newInstance(appInfo).apply {
+                                onRestrictionSet = { app, endTime, isForever ->
+                                    viewModel.addRestriction(app, endTime, isForever)
+                                    Toast.makeText(
+                                        this@DashboardActivity,
+                                        "${app.appName} has been restricted",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    
+                                    // Check permissions again after adding a restriction
+                                    checkRequiredPermissions()
+                                }
+                                show(supportFragmentManager, RestrictionSettingsBottomSheet.TAG)
                             }
-                            show(supportFragmentManager, RestrictionSettingsBottomSheet.TAG)
                         }
+                        show(supportFragmentManager, AppSelectionBottomSheet.TAG)
                     }
-                    show(supportFragmentManager, AppSelectionBottomSheet.TAG)
                 }
             }
 
@@ -170,12 +148,95 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkRequiredPermissions(showPrompt: Boolean = true) {
+        try {
+            // Check for usage stats permission
+            if (!viewModel.hasUsageStatsPermission()) {
+                if (showPrompt) {
+                    showUsageStatsPermissionDialog()
+                }
+                return
+            }
+            
+            // Only check these if we have active restrictions
+            if (viewModel.activeRestrictions.value?.isNotEmpty() == true) {
+                // Check for accessibility service permission
+                if (!viewModel.checkAccessibilityPermission()) {
+                    if (showPrompt) {
+                        showAccessibilityPermissionDialog()
+                    }
+                    return
+                }
+                
+                // Check for overlay permission
+                if (!viewModel.checkOverlayPermission()) {
+                    if (showPrompt) {
+                        showOverlayPermissionDialog()
+                    }
+                    return
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking permissions", e)
+        }
+    }
+    
+    private fun showUsageStatsPermissionDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.permission_required)
+            .setMessage(R.string.usage_stats_permission_message)
+            .setPositiveButton(R.string.enable) { _, _ ->
+                val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                startActivity(intent)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    private fun showAccessibilityPermissionDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.permission_required)
+            .setMessage(R.string.accessibility_permission_message)
+            .setPositiveButton(R.string.enable) { _, _ ->
+                viewModel.requestAccessibilityPermission()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    private fun showOverlayPermissionDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.permission_required)
+            .setMessage(R.string.overlay_permission_message)
+            .setPositiveButton(R.string.enable) { _, _ ->
+                viewModel.requestOverlayPermission()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     private fun showTimeLimitDialog(app: AppInfo) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_time_limit, null)
-        val timePicker = dialogView.findViewById<NumberPicker>(R.id.timePickerSpinner).apply {
-            minValue = 1
-            maxValue = 24
-            value = 2 // Default 2 hours
+        
+        // Set up hour picker
+        val hourPicker = dialogView.findViewById<NumberPicker>(R.id.hourPicker).apply {
+            minValue = 0
+            maxValue = 23
+            value = 1 // Default 1 hour
+        }
+        
+        // Set up minute picker
+        val minutePicker = dialogView.findViewById<NumberPicker>(R.id.minutePicker).apply {
+            minValue = 0
+            maxValue = 59
+            value = 0 // Default 0 minutes
+        }
+        
+        // Set up second picker
+        val secondPicker = dialogView.findViewById<NumberPicker>(R.id.secondPicker).apply {
+            minValue = 0
+            maxValue = 59
+            value = 0 // Default 0 seconds
         }
 
         MaterialAlertDialogBuilder(this)
@@ -183,8 +244,30 @@ class DashboardActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("Set") { _, _ ->
                 try {
-                    val limitInHours = timePicker.value
-                    viewModel.setAppTimeLimit(app.packageName, limitInHours * 60 * 60 * 1000L)
+                    // Calculate total time in milliseconds
+                    val hours = hourPicker.value
+                    val minutes = minutePicker.value
+                    val seconds = secondPicker.value
+                    
+                    val totalTimeMillis = (hours * 60 * 60 * 1000L) + 
+                                         (minutes * 60 * 1000L) + 
+                                         (seconds * 1000L)
+                    
+                    // Ensure at least 1 second is set
+                    if (totalTimeMillis > 0) {
+                        viewModel.setAppTimeLimit(app.packageName, totalTimeMillis)
+                        Toast.makeText(
+                            this, 
+                            "Time limit set: ${formatDuration(totalTimeMillis)}", 
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Please set a time limit greater than zero",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting time limit", e)
                     Toast.makeText(this, "Failed to set time limit", Toast.LENGTH_SHORT).show()
@@ -300,7 +383,7 @@ class DashboardActivity : AppCompatActivity() {
             val sortedData = usageData.sortedByDescending { it.timeSpent }.take(4)
             
             // Update the card values with the usage data
-            binding.tvTotalScreenTime.text = formatDuration(sortedData.sumOf { it.timeSpent })
+            updateTotalScreenTime(sortedData.sumOf { it.timeSpent })
             binding.tvFocusScore.text = calculateFocusScore(sortedData).toString()
             binding.tvProductiveTime.text = formatDuration(calculateProductiveTime(sortedData))
             binding.tvSuccessRate.text = "${calculateSuccessRate(sortedData)}%"
@@ -347,38 +430,51 @@ class DashboardActivity : AppCompatActivity() {
         try {
             val hours = TimeUnit.MILLISECONDS.toHours(totalTimeMillis)
             val minutes = TimeUnit.MILLISECONDS.toMinutes(totalTimeMillis) % 60
-            binding.tvTotalScreenTime.text = getString(R.string.total_screen_time, hours, minutes)
+            
+            // Format for the new UI
+            binding.tvTotalScreenTime.text = when {
+                hours > 0 -> "${hours}h ${minutes}m"
+                else -> "${minutes}m"
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error updating total screen time", e)
+            binding.tvTotalScreenTime.text = "0m"
         }
     }
 
     private fun updateScreenTimeChart() {
         try {
-            val entries = (0..23).map { hour ->
-                Entry(hour.toFloat(), (Math.sin(hour * Math.PI / 12) * 50 + 50).toFloat())
-            }
-
-            val dataSet = LineDataSet(entries, "").apply {  // Empty string for no label
-                mode = LineDataSet.Mode.CUBIC_BEZIER
-                cubicIntensity = 0.2f
-                setDrawFilled(true)
-                setDrawCircles(false)
-                lineWidth = 2f
-                color = ContextCompat.getColor(this@DashboardActivity, R.color.chart_blue)
-                fillColor = ContextCompat.getColor(this@DashboardActivity, R.color.chart_blue)
-                fillAlpha = 25
-                setDrawHorizontalHighlightIndicator(false)
-                setDrawVerticalHighlightIndicator(false)
-                setDrawValues(false)  // Disable value text on the line
-            }
-
-            binding.screenTimeChart.apply {
-                data = LineData(dataSet)
-                invalidate()
-            }
+            // We'll use a simpler approach without MPAndroidChart
+            Log.d(TAG, "Updating screen time chart with a simpler approach")
         } catch (e: Exception) {
             Log.e(TAG, "Error updating screen time chart", e)
+        }
+    }
+
+    private fun checkPermissionsAndProceed(onPermissionsGranted: () -> Unit) {
+        try {
+            // Check for usage stats permission first
+            if (!viewModel.hasUsageStatsPermission()) {
+                showUsageStatsPermissionDialog()
+                return
+            }
+            
+            // Check for accessibility service permission
+            if (!viewModel.checkAccessibilityPermission()) {
+                showAccessibilityPermissionDialog()
+                return
+            }
+            
+            // Check for overlay permission
+            if (!viewModel.checkOverlayPermission()) {
+                showOverlayPermissionDialog()
+                return
+            }
+            
+            // All permissions granted, proceed
+            onPermissionsGranted()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking permissions", e)
         }
     }
 } 
