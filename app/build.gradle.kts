@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mindsync"
+    namespace = "com.mindsynclabs.focusapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mindsync"
+        applicationId = "com.mindsynclabs.focusapp"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

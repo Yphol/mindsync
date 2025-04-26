@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.mindsync">
+    package="com.mindsynclabs.focusapp">
 
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
-        android:name=".MindSyncApplication"
+        android:name="com.mindsynclabs.focusapp.MindSyncApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -65,12 +65,12 @@
         </service>
 
         <receiver
-            android:name=".service.TimerBroadcastReceiver"
+            android:name=".service.TimerService$TimerBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.example.mindsync.FOCUS_TIMER_FINISHED" />
-                <action android:name="com.example.mindsync.RESTRICTION_EXPIRED" />
+                <action android:name="com.mindsynclabs.focusapp.FOCUS_TIMER_FINISHED" />
+                <action android:name="com.mindsynclabs.focusapp.RESTRICTION_EXPIRED" />
             </intent-filter>
         </receiver>
     </application>

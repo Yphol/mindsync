@@ -3,9 +3,9 @@
     android:description="@string/accessibility_permission_message"
     android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged|typeWindowsChanged"
     android:accessibilityFlags="flagReportViewIds|flagRequestFilterKeyEvents|flagRequestEnhancedWebAccessibility|flagIncludeNotImportantViews"
-    android:accessibilityFeedbackType="feedbackVisual|feedbackGeneric"
+    android:accessibilityFeedbackType="feedbackGeneric"
     android:notificationTimeout="50"
     android:canRetrieveWindowContent="true"
     android:canRequestFilterKeyEvents="true"
     android:canRequestEnhancedWebAccessibility="true"
-    android:settingsActivity="com.example.mindsync.ui.dashboard.DashboardActivity" /> 
+    android:settingsActivity="com.mindsynclabs.focusapp.ui.dashboard.DashboardActivity" /> 
