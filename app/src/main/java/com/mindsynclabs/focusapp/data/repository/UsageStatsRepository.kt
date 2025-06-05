@@ -200,12 +200,14 @@ class UsageStatsRepository @Inject constructor(
                     val appInfo = packageManager.getApplicationInfo(packageName, 0)
                     val appName = packageManager.getApplicationLabel(appInfo).toString()
                     
+                    val firstEventTime = sortedEvents.firstOrNull()?.timeStamp ?: startTime
+
                     appUsageList.add(
                         AppUsageData(
                             appName = appName,
                             packageName = packageName,
                             timeSpent = totalTimeInForeground,
-                            date = Date(startTime),
+                            date = Date(firstEventTime),
                             overLimitTime = 0, // This would need to be calculated based on your app's limits
                             sessionCount = sessionCount
                         )
